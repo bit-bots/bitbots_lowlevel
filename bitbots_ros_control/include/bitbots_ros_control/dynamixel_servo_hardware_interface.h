@@ -66,6 +66,7 @@ class DynamixelServoHardwareInterface : public hardware_interface::RobotHW {
   void write(const ros::Time &t, const ros::Duration &dt);
   void addBusInterface(ServoBusInterface *bus);
   void setParent(hardware_interface::RobotHW *parent);
+  void clean_up();
 
  private:
   ros::NodeHandle nh_;

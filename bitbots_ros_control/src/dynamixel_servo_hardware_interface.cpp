@@ -209,4 +209,7 @@ void DynamixelServoHardwareInterface::write(const ros::Time &t, const ros::Durat
     }
   }
 }
+void DynamixelServoHardwareInterface::clean_up(){
+  delete dyn_reconf_server_;
+}
 }

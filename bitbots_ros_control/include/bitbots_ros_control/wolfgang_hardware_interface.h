@@ -25,6 +25,8 @@ class WolfgangHardwareInterface : public hardware_interface::RobotHW {
 
   void write(const ros::Time &t, const ros::Duration &dt);
 
+  void clean_up();
+
  private:
   bool create_interfaces(ros::NodeHandle &nh, std::vector<std::pair<std::string, int>> dxl_devices);
 
