@@ -29,6 +29,7 @@ bool CoreHardwareInterface::switch_power(std_srvs::SetBoolRequest &req, std_srvs
 bool CoreHardwareInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
   nh_ = nh;
 
+  data = (uint8_t *) malloc(16 * sizeof(uint8_t));
   power_pub_ = nh.advertise<std_msgs::Bool>("/core/power_switch_status", 1);
   vcc_pub_ = nh.advertise<std_msgs::Float64>("/core/vcc", 1);
   vbat_pub_ = nh.advertise<std_msgs::Float64>("/core/vbat", 1);
@@ -50,7 +51,6 @@ void CoreHardwareInterface::read(const ros::Time &t, const ros::Duration &dt) {
 
   if (read_counter_ % read_rate_ == 0) {
     read_counter_ = 0;
-    uint8_t *data = (uint8_t *) malloc(16 * sizeof(uint8_t));
     // read core
     bool read_successful = true;
     if (driver_->readMultipleRegisters(id_, 26, 12, data)) {
