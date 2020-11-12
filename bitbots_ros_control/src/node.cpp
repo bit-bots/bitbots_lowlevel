@@ -31,8 +31,8 @@ int main(int argc, char *argv[]) {
   // load controller directly here so that we have control when we shut down
   // sometimes we want to only load some of the controllers
   bool only_imu, only_pressure;
-  nh.param<bool>("only_imu", only_imu, false);
-  nh.param<bool>("only_pressure", only_pressure, false);
+  nh.param<bool>("/ros_control/only_imu", only_imu, false);
+  nh.param<bool>("/ros_control/only_pressure", only_pressure, false);
   std::vector<std::string> names;
 
   if (only_imu){
