@@ -11,7 +11,7 @@ ButtonHardwareInterface::ButtonHardwareInterface(std::shared_ptr<DynamixelDriver
 
 bool ButtonHardwareInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
   nh_ = nh;
-  data = (uint8_t *) malloc(sizeof(uint8_t));
+  data_ = (uint8_t *) malloc(3 * sizeof(uint8_t));
   button_pub_ = nh.advertise<bitbots_buttons::Buttons>(topic_, 1);
   diagnostic_pub_ = nh.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 10, true);
 
@@ -26,11 +26,11 @@ void ButtonHardwareInterface::read(const ros::Time &t, const ros::Duration &dt) 
   if (counter_ != 0)
     return;
   bool read_successful = true;
-  if (driver_->readMultipleRegisters(id_, 76, 3, data)) {
+  if (driver_->readMultipleRegisters(id_, 76, 3, data_)) {
     bitbots_buttons::Buttons msg;
-    msg.button1 = data[0];
-    msg.button2 = data[1];
-    msg.button3 = data[2];
+    msg.button1 = data_[0];
+    msg.button2 = data_[1];
+    msg.button3 = data_[2];
     button_pub_.publish(msg);
   } else {
     ROS_ERROR_THROTTLE(1.0, "Couldn't read Buttons");

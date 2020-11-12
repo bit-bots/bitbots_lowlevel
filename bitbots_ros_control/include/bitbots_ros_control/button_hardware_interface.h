@@ -35,7 +35,7 @@ class ButtonHardwareInterface : public hardware_interface::RobotHW {
   ros::Publisher button_pub_;
   int read_rate_;
   ros::Publisher diagnostic_pub_;
-  uint8_t *data;
+  uint8_t *data_;
 
 };
 }
