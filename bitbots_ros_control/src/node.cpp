@@ -71,7 +71,6 @@ int main(int argc, char *argv[]) {
     }
   }
   thread.join();
-  hw.clean_up();
   delete cm;
   ros::shutdown();
   return 0;

@@ -19,13 +19,13 @@ namespace bitbots_ros_control {
 class WolfgangHardwareInterface : public hardware_interface::RobotHW {
  public:
   explicit WolfgangHardwareInterface(ros::NodeHandle &nh);
+  ~WolfgangHardwareInterface();
+
   bool init(ros::NodeHandle &nh);
 
   void read(const ros::Time &t, const ros::Duration &dt);
 
   void write(const ros::Time &t, const ros::Duration &dt);
-
-  void clean_up();
 
  private:
   bool create_interfaces(ros::NodeHandle &nh, std::vector<std::pair<std::string, int>> dxl_devices);

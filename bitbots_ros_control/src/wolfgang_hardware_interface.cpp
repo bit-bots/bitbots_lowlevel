@@ -55,6 +55,15 @@ WolfgangHardwareInterface::WolfgangHardwareInterface(ros::NodeHandle &nh) {
   }
 }
 
+WolfgangHardwareInterface::~WolfgangHardwareInterface(){
+  // clean up memeory
+  for (std::vector < hardware_interface::RobotHW * > &port_interfaces : interfaces_) {
+    for (hardware_interface::RobotHW *interface : port_interfaces) {
+      delete interface;
+    }
+  }
+}
+
 bool WolfgangHardwareInterface::create_interfaces(ros::NodeHandle &nh,
                                                   std::vector<std::pair<std::string, int>> dxl_devices) {
   interfaces_ = std::vector < std::vector < hardware_interface::RobotHW * >> ();
@@ -295,14 +304,4 @@ void WolfgangHardwareInterface::write(const ros::Time &t, const ros::Duration &d
   }
 }
 
-
-void WolfgangHardwareInterface::clean_up(){
-  // clean up memeory
-  servo_interface_.clean_up();
-  for (std::vector < hardware_interface::RobotHW * > &port_interfaces : interfaces_) {
-    for (hardware_interface::RobotHW *interface : port_interfaces) {
-      delete interface;
-    }
-  }
-}
 }

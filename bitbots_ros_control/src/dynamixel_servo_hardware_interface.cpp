@@ -7,6 +7,10 @@ namespace bitbots_ros_control {
 
 DynamixelServoHardwareInterface::DynamixelServoHardwareInterface() {}
 
+DynamixelServoHardwareInterface::~DynamixelServoHardwareInterface(){
+  delete dyn_reconf_server_;
+}
+
 void DynamixelServoHardwareInterface::addBusInterface(ServoBusInterface *bus) {
   bus_interfaces_.push_back(bus);
 }
@@ -208,8 +212,5 @@ void DynamixelServoHardwareInterface::write(const ros::Time &t, const ros::Durat
       i++;
     }
   }
-}
-void DynamixelServoHardwareInterface::clean_up(){
-  delete dyn_reconf_server_;
 }
 }
