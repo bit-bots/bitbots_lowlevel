@@ -16,7 +16,7 @@ BitFootHardwareInterface::BitFootHardwareInterface(std::shared_ptr<DynamixelDriv
 bool BitFootHardwareInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
   nh_ = nh;
   current_pressure_.resize(4, std::vector<double>());
-  uint8_t *data = (uint8_t *) malloc(16 * sizeof(uint8_t));
+  data = (uint8_t *) malloc(16 * sizeof(uint8_t));
   pressure_pub_ = nh.advertise<bitbots_msgs::FootPressure>(topic_name_, 1);
   diagnostic_pub_ = nh.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 10, true);
   return true;
