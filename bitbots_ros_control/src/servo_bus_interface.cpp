@@ -11,6 +11,19 @@ ServoBusInterface::ServoBusInterface(std::shared_ptr<DynamixelDriver> &driver,
 }
 
 bool ServoBusInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
+  // malloc memory only once for later reads and writes to improve performacen
+  int32_t *data_sync_read_positions_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
+  int32_t *data_sync_read_velocities_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
+  int32_t *data_sync_read_efforts_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
+  int32_t *data_sync_read_pwms_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
+  int32_t *data_sync_read_error_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
+  int *sync_write_goal_position_ = (int *) malloc(joint_names_.size() * sizeof(int));
+  int *sync_write_goal_velocity_ = (int *) malloc(joint_names_.size() * sizeof(int));
+  int *sync_write_profile_velocity_ = (int *) malloc(joint_names_.size() * sizeof(int));
+  int *sync_write_profile_acceleration_ = (int *) malloc(joint_names_.size() * sizeof(int));
+  int *sync_write_goal_current_ = (int *) malloc(joint_names_.size() * sizeof(int));
+  int *sync_write_goal_pwm_ = (int *) malloc(joint_names_.size() * sizeof(int));
+
   diagnostic_pub_ = nh.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 10, true);
   speak_pub_ = nh.advertise<humanoid_league_msgs::Audio>("/speak", 1, true);
 
@@ -67,6 +80,20 @@ bool ServoBusInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
     }
   }
   writeTorque(nh.param("servos/auto_torque", false));
+}
+
+ServoBusInterface::~ServoBusInterface(){
+  free(data_sync_read_positions_);
+  free(data_sync_read_velocities_);
+  free(data_sync_read_efforts_);
+  free(data_sync_read_pwms_);
+  free(data_sync_read_error_);
+  free(sync_write_goal_position_);
+  free(sync_write_goal_velocity_);
+  free(sync_write_profile_velocity_);
+  free(sync_write_profile_acceleration_);
+  free(sync_write_goal_current_);
+  free(sync_write_goal_pwm_);
 }
 
 bool ServoBusInterface::loadDynamixels(ros::NodeHandle &nh) {
@@ -477,25 +504,23 @@ bool ServoBusInterface::syncReadPositions() {
    * Reads all position information with a single sync read
    */
   bool success;
-  int32_t *data = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  success = driver_->syncRead("Present_Position", data);
+  success = driver_->syncRead("Present_Position", data_sync_read_positions_);
   if (success) {
     for (int i = 0; i < joint_count_; i++) {
       // TODO test if this is required
-      if (data[i] == 0) {
+      if (data_sync_read_positions_[i] == 0) {
         // a value of 0 is often a reading error, therefore we discard it
         // this should not cause issues when a motor is actually close to 0
         // since 1 bit only corresponds to + or - 0.1 deg
         continue;
       }
-      double current_pos = driver_->convertValue2Radian(joint_ids_[i], data[i]);
+      double current_pos = driver_->convertValue2Radian(joint_ids_[i], data_sync_read_positions_[i]);
       if (current_pos < 3.15 && current_pos > -3.15) {
         //only write values which are possible
         current_position_[i] = current_pos;
       }
     }
   }
-  free(data);
   return success;
 }
 
@@ -504,15 +529,12 @@ bool ServoBusInterface::syncReadVelocities() {
    * Reads all velocity information with a single sync read
    */
   bool success;
-  int32_t *data = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  success = driver_->syncRead("Present_Velocity", data);
+  success = driver_->syncRead("Present_Velocity", data_sync_read_velocities_);
   if (success) {
     for (int i = 0; i < joint_count_; i++) {
-      current_velocity_[i] = driver_->convertValue2Velocity(joint_ids_[i], data[i]);
+      current_velocity_[i] = driver_->convertValue2Velocity(joint_ids_[i], data_sync_read_velocities_[i]);
     }
   }
-  free(data);
-
   return success;
 }
 
@@ -521,15 +543,12 @@ bool ServoBusInterface::syncReadEfforts() {
    * Reads all effort information with a single sync read
    */
   bool success;
-  int32_t *data = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  success = driver_->syncRead("Present_Current", data);
+  success = driver_->syncRead("Present_Current", data_sync_read_efforts_);
   if (success) {
     for (int i = 0; i < joint_count_; i++) {
-      current_effort_[i] = driver_->convertValue2Torque(joint_ids_[i], data[i]);
+      current_effort_[i] = driver_->convertValue2Torque(joint_ids_[i], data_sync_read_efforts_[i]);
     }
   }
-  free(data);
-
   return success;
 }
 
@@ -538,18 +557,15 @@ bool ServoBusInterface::syncReadPWMs() {
    * Reads all PWM information with a single sync read
    */
   bool success;
-  int32_t *data = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  success = driver_->syncRead("Present_PWM", data);
+  success = driver_->syncRead("Present_PWM", data_sync_read_pwms_);
   if (success) {
     for (int i = 0; i < joint_count_; i++) {
       // the data is in int16
       // 100% is a value of 885
       // convert to range -1 to 1
-      current_pwm_[i] = ((int16_t) data[i]) / 885.0;
+      current_pwm_[i] = ((int16_t) data_sync_read_pwms_[i]) / 885.0;
     }
   }
-  free(data);
-
   return success;
 }
 
@@ -558,14 +574,12 @@ bool ServoBusInterface::syncReadError() {
    * Reads all error bytes with a single sync read
    */
   bool success;
-  int32_t *data = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  success = driver_->syncRead("Hardware_Error_Status", data);
+  success = driver_->syncRead("Hardware_Error_Status", data_sync_read_error_);
   if (success) {
     for (int i = 0; i < joint_count_; i++) {
-      current_error_[i] = data[i];
+      current_error_[i] = data_sync_read_error_[i];
     }
   }
-  free(data);
   return success;
 }
 
@@ -624,98 +638,86 @@ void ServoBusInterface::syncWritePosition() {
   /**
    * Writes all goal positions with a single sync write
    */
-  int *goal_position = (int *) malloc(joint_names_.size() * sizeof(int));
   float radian;
   for (size_t num = 0; num < joint_names_.size(); num++) {
     radian = goal_position_[num] - joint_mounting_offsets_[num] - joint_offsets_[num];
-    goal_position[num] = driver_->convertRadian2Value(joint_ids_[num], radian);
+    sync_write_goal_position_[num] = driver_->convertRadian2Value(joint_ids_[num], radian);
   }
-  driver_->syncWrite("Goal_Position", goal_position);
-  free(goal_position);
+  driver_->syncWrite("Goal_Position", sync_write_goal_position_);
 }
 
 void ServoBusInterface::syncWriteVelocity() {
   /**
    * Writes all goal velocities with a single sync write
    */
-  int *goal_velocity = (int *) malloc(joint_names_.size() * sizeof(int));
   for (size_t num = 0; num < joint_names_.size(); num++) {
-    goal_velocity[num] = driver_->convertVelocity2Value(joint_ids_[num], goal_velocity_[num]);
+    sync_write_goal_velocity_[num] = driver_->convertVelocity2Value(joint_ids_[num], goal_velocity_[num]);
   }
-  driver_->syncWrite("Goal_Velocity", goal_velocity);
-  free(goal_velocity);
+  driver_->syncWrite("Goal_Velocity", sync_write_goal_velocity_);
 }
 
 void ServoBusInterface::syncWriteProfileVelocity() {
   /**
    * Writes all profile velocities with a single sync write
    */
-  int *goal_velocity = (int *) malloc(joint_names_.size() * sizeof(int));
   for (size_t num = 0; num < joint_names_.size(); num++) {
     if (goal_velocity_[num] < 0) {
       // we want to set to maximum, which is 0
-      goal_velocity[num] = 0;
+      sync_write_profile_velocity_[num] = 0;
     } else {
       // use max to prevent accidentially setting 0
-      goal_velocity[num] = std::max(driver_->convertVelocity2Value(joint_ids_[num], goal_velocity_[num]), 1);
+      sync_write_profile_velocity_[num] = std::max(driver_->convertVelocity2Value(joint_ids_[num], goal_velocity_[num]), 1);
     }
   }
-  driver_->syncWrite("Profile_Velocity", goal_velocity);
-  free(goal_velocity);
+  driver_->syncWrite("Profile_Velocity", sync_write_profile_velocity_);
 }
 
 void ServoBusInterface::syncWriteProfileAcceleration() {
   /**
    * Writes all profile accelerations with a single sync write
    */
-  int *goal_acceleration = (int *) malloc(joint_names_.size() * sizeof(int));
   for (size_t num = 0; num < joint_names_.size(); num++) {
     if (goal_acceleration_[num] < 0) {
       // we want to set to maximum, which is 0
-      goal_acceleration[num] = 0;
+      sync_write_profile_acceleration_[num] = 0;
     } else {
       //572.9577952 for change of units, 214.577 rev/min^2 per LSB
-      goal_acceleration[num] = std::max(static_cast<int>(goal_acceleration_[num] * 572.9577952 / 214.577), 1);
+      sync_write_profile_acceleration_[num] = std::max(static_cast<int>(goal_acceleration_[num] * 572.9577952 / 214.577), 1);
     }
   }
-  driver_->syncWrite("Profile_Acceleration", goal_acceleration);
-  free(goal_acceleration);
+  driver_->syncWrite("Profile_Acceleration", sync_write_profile_acceleration_);
 }
 
 void ServoBusInterface::syncWriteCurrent() {
   /**
    * Writes all goal currents with a single sync write
    */
-  int *goal_current = (int *) malloc(joint_names_.size() * sizeof(int));
   for (size_t num = 0; num < joint_names_.size(); num++) {
     if (goal_effort_[num] < 0) {
       // we want to set to maximum, which is different for MX-64 and MX-106
       if (driver_->getModelNum(joint_ids_[num]) == 311) {
-        goal_current[num] = 1941;
+        sync_write_goal_current_[num] = 1941;
       } else if (driver_->getModelNum(joint_ids_[num]) == 321) {
-        goal_current[num] = 2047;
+        sync_write_goal_current_[num] = 2047;
       } else {
         ROS_WARN("Maximal current for this dynamixel model is not defined");
       }
     } else {
-      goal_current[num] = driver_->convertTorque2Value(joint_ids_[num], goal_effort_[num]);
+      sync_write_goal_current_[num] = driver_->convertTorque2Value(joint_ids_[num], goal_effort_[num]);
     }
   }
-  driver_->syncWrite("Goal_Current", goal_current);
-  free(goal_current);
+  driver_->syncWrite("Goal_Current", sync_write_goal_current_);
 }
 
 void ServoBusInterface::syncWritePWM() {
-  int *goal_current = (int *) malloc(joint_names_.size() * sizeof(int));
   for (size_t num = 0; num < joint_names_.size(); num++) {
     if (goal_effort_[num] < 0) {
       // we want to set to maximum
-      goal_current[num] = 855;
+      sync_write_goal_pwm_[num] = 855;
     } else {
-      goal_current[num] = goal_effort_[num] / 100.0 * 855.0;
+      sync_write_goal_pwm_[num] = goal_effort_[num] / 100.0 * 855.0;
     }
   }
-  driver_->syncWrite("Goal_PWM", goal_current);
-  free(goal_current);
+  driver_->syncWrite("Goal_PWM", sync_write_goal_pwm_);
 }
 }
