@@ -36,7 +36,6 @@ void ButtonHardwareInterface::read(const ros::Time &t, const ros::Duration &dt) 
     ROS_ERROR_THROTTLE(1.0, "Couldn't read Buttons");
     read_successful = false;
   }
-  free(data);
 
   // diagnostics. check if values are changing, otherwise there is a connection error on the board
   diagnostic_msgs::DiagnosticArray array_msg = diagnostic_msgs::DiagnosticArray();
