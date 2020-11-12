@@ -70,18 +70,18 @@ class ServoBusInterface : public hardware_interface::RobotHW {
   void syncWriteCurrent();
   void syncWriteProfileAcceleration();
 
-
   int32_t *data_sync_read_positions_;
   int32_t *data_sync_read_velocities_;
   int32_t *data_sync_read_efforts_;
   int32_t *data_sync_read_pwms_;
   int32_t *data_sync_read_error_;
-  int *sync_write_goal_position_;
-  int *sync_write_goal_velocity_;
-  int *sync_write_profile_velocity_;
-  int *sync_write_profile_acceleration_;
-  int *sync_write_goal_current_;
-  int *sync_write_goal_pwm_;
+  int32_t *sync_write_goal_position_;
+  int32_t *sync_write_goal_velocity_;
+  int32_t *sync_write_profile_velocity_;
+  int32_t *sync_write_profile_acceleration_;
+  int32_t *sync_write_goal_current_;
+  int32_t *sync_write_goal_pwm_;
+  std::vector<uint8_t> sync_read_all_data_;
 
   bool first_cycle_;
   bool lost_servo_connection_;

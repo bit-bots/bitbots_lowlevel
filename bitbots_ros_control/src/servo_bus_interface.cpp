@@ -60,18 +60,19 @@ bool ServoBusInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
   goal_effort_.resize(joint_count_, 0);
   goal_torque_individual_.resize(joint_count_, 1);
 
-  // malloc memory only once for later reads and writes to improve performacen
-  data_sync_read_positions_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  data_sync_read_velocities_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  data_sync_read_efforts_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  data_sync_read_pwms_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  data_sync_read_error_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  sync_write_goal_position_ = (int *) malloc(joint_count_ * sizeof(int));
-  sync_write_goal_velocity_ = (int *) malloc(joint_count_ * sizeof(int));
-  sync_write_profile_velocity_ = (int *) malloc(joint_count_ * sizeof(int));
-  sync_write_profile_acceleration_ = (int *) malloc(joint_count_ * sizeof(int));
-  sync_write_goal_current_ = (int *) malloc(joint_count_ * sizeof(int));
-  sync_write_goal_pwm_ = (int *) malloc(joint_count_ * sizeof(int));
+  // malloc memory only once for later reads and writes to improve performance
+  data_sync_read_positions_ = new int32_t;
+  data_sync_read_velocities_ = new int32_t;
+  data_sync_read_efforts_ = new int32_t;
+  data_sync_read_pwms_ = new int32_t;
+  data_sync_read_error_ = new int32_t;
+  sync_write_goal_position_ = new int32_t;
+  sync_write_goal_velocity_ = new int32_t;
+  sync_write_profile_velocity_ = new int32_t;
+  sync_write_profile_acceleration_ = new int32_t;
+  sync_write_goal_current_ = new int32_t;
+  sync_write_goal_pwm_ = new int32_t;
+
 
   // write ROM and RAM values if wanted
   if (nh.param("servos/set_ROM_RAM", false)) {
@@ -83,17 +84,17 @@ bool ServoBusInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
 }
 
 ServoBusInterface::~ServoBusInterface(){
-  free(data_sync_read_positions_);
-  free(data_sync_read_velocities_);
-  free(data_sync_read_efforts_);
-  free(data_sync_read_pwms_);
-  free(data_sync_read_error_);
-  free(sync_write_goal_position_);
-  free(sync_write_goal_velocity_);
-  free(sync_write_profile_velocity_);
-  free(sync_write_profile_acceleration_);
-  free(sync_write_goal_current_);
-  free(sync_write_goal_pwm_);
+  delete data_sync_read_positions_;
+  delete data_sync_read_velocities_;
+  delete data_sync_read_efforts_;
+  delete data_sync_read_pwms_;
+  delete data_sync_read_error_;
+  delete sync_write_goal_position_;
+  delete sync_write_goal_velocity_;
+  delete sync_write_profile_velocity_;
+  delete sync_write_profile_acceleration_;
+  delete sync_write_goal_current_;
+  delete sync_write_goal_pwm_;
 }
 
 bool ServoBusInterface::loadDynamixels(ros::NodeHandle &nh) {
@@ -604,17 +605,16 @@ bool ServoBusInterface::syncReadAll() {
   /**
    * Reads all positions, velocities and efforts with a single sync read
    */
-  std::vector<uint8_t> data;
-  if (driver_->syncReadMultipleRegisters(126, 10, &data)) {
+  if (driver_->syncReadMultipleRegisters(126, 10, &sync_read_all_data_)) {
     int16_t eff;
     uint32_t vel;
     uint32_t pos;
     for (int i = 0; i < joint_count_; i++) {
-      eff = dxlMakeword(data[i * 10], data[i * 10 + 1]);
-      vel = dxlMakedword(dxlMakeword(data[i * 10 + 2], data[i * 10 + 3]),
-                         dxlMakeword(data[i * 10 + 4], data[i * 10 + 5]));
-      pos = dxlMakedword(dxlMakeword(data[i * 10 + 6], data[i * 10 + 7]),
-                         dxlMakeword(data[i * 10 + 8], data[i * 10 + 9]));
+      eff = dxlMakeword(sync_read_all_data_[i * 10], sync_read_all_data_[i * 10 + 1]);
+      vel = dxlMakedword(dxlMakeword(sync_read_all_data_[i * 10 + 2], sync_read_all_data_[i * 10 + 3]),
+                         dxlMakeword(sync_read_all_data_[i * 10 + 4], sync_read_all_data_[i * 10 + 5]));
+      pos = dxlMakedword(dxlMakeword(sync_read_all_data_[i * 10 + 6], sync_read_all_data_[i * 10 + 7]),
+                         dxlMakeword(sync_read_all_data_[i * 10 + 8], sync_read_all_data_[i * 10 + 9]));
       current_effort_[i] = driver_->convertValue2Torque(joint_ids_[i], eff);
       current_velocity_[i] = driver_->convertValue2Velocity(joint_ids_[i], vel);
       double current_pos = driver_->convertValue2Radian(joint_ids_[i], pos);
