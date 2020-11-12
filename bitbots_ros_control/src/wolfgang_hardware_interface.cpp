@@ -291,7 +291,6 @@ void threaded_write(std::vector<hardware_interface::RobotHW *> &port_interfaces,
 void WolfgangHardwareInterface::write(const ros::Time &t, const ros::Duration &dt) {
   // write all controller values to interfaces
   servo_interface_.write(t, dt);
-
   std::vector<std::thread> threads;
   // start all writes
   for (std::vector < hardware_interface::RobotHW * > &port_interfaces : interfaces_) {

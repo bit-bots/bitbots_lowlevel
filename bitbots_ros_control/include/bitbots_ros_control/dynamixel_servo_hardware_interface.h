@@ -59,7 +59,6 @@ struct Joint {
 class DynamixelServoHardwareInterface : public hardware_interface::RobotHW {
  public:
   explicit DynamixelServoHardwareInterface();
-  ~DynamixelServoHardwareInterface();
   void reconfCallback(bitbots_ros_control::dynamixel_servo_hardware_interface_paramsConfig &config, uint32_t level);
 
   bool init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) override;

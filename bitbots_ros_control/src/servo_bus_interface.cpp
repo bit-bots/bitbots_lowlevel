@@ -11,19 +11,6 @@ ServoBusInterface::ServoBusInterface(std::shared_ptr<DynamixelDriver> &driver,
 }
 
 bool ServoBusInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
-  // malloc memory only once for later reads and writes to improve performacen
-  int32_t *data_sync_read_positions_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  int32_t *data_sync_read_velocities_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  int32_t *data_sync_read_efforts_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  int32_t *data_sync_read_pwms_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  int32_t *data_sync_read_error_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
-  int *sync_write_goal_position_ = (int *) malloc(joint_names_.size() * sizeof(int));
-  int *sync_write_goal_velocity_ = (int *) malloc(joint_names_.size() * sizeof(int));
-  int *sync_write_profile_velocity_ = (int *) malloc(joint_names_.size() * sizeof(int));
-  int *sync_write_profile_acceleration_ = (int *) malloc(joint_names_.size() * sizeof(int));
-  int *sync_write_goal_current_ = (int *) malloc(joint_names_.size() * sizeof(int));
-  int *sync_write_goal_pwm_ = (int *) malloc(joint_names_.size() * sizeof(int));
-
   diagnostic_pub_ = nh.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 10, true);
   speak_pub_ = nh.advertise<humanoid_league_msgs::Audio>("/speak", 1, true);
 
@@ -72,6 +59,19 @@ bool ServoBusInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
   goal_acceleration_.resize(joint_count_, 0);
   goal_effort_.resize(joint_count_, 0);
   goal_torque_individual_.resize(joint_count_, 1);
+
+  // malloc memory only once for later reads and writes to improve performacen
+  data_sync_read_positions_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
+  data_sync_read_velocities_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
+  data_sync_read_efforts_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
+  data_sync_read_pwms_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
+  data_sync_read_error_ = (int32_t *) malloc(joint_count_ * sizeof(int32_t));
+  sync_write_goal_position_ = (int *) malloc(joint_count_ * sizeof(int));
+  sync_write_goal_velocity_ = (int *) malloc(joint_count_ * sizeof(int));
+  sync_write_profile_velocity_ = (int *) malloc(joint_count_ * sizeof(int));
+  sync_write_profile_acceleration_ = (int *) malloc(joint_count_ * sizeof(int));
+  sync_write_goal_current_ = (int *) malloc(joint_count_ * sizeof(int));
+  sync_write_goal_pwm_ = (int *) malloc(joint_count_ * sizeof(int));
 
   // write ROM and RAM values if wanted
   if (nh.param("servos/set_ROM_RAM", false)) {
@@ -196,7 +196,6 @@ void ServoBusInterface::read(const ros::Time &t, const ros::Duration &dt) {
         read_successful = false;
       }
     }
-
     if (read_velocity_) {
       if (!syncReadVelocities()) {
         ROS_ERROR_THROTTLE(1.0, "Couldn't read current joint velocity!");
@@ -204,7 +203,6 @@ void ServoBusInterface::read(const ros::Time &t, const ros::Duration &dt) {
         read_successful = false;
       }
     }
-
     if (read_effort_) {
       if (!syncReadEfforts()) {
         ROS_ERROR_THROTTLE(1.0, "Couldn't read current joint effort!");
@@ -274,12 +272,10 @@ void ServoBusInterface::write(const ros::Time &t, const ros::Duration &dt) {
   /**
    * This is part of the mainloop and handles all the writing to the connected devices
    */
-
   //check if we have to switch the torque
   if (current_torque_ != goal_torque_) {
     writeTorque(goal_torque_);
   }
-
   if (switch_individual_torque_) {
     writeTorqueForServos(goal_torque_individual_);
     switch_individual_torque_ = false;
@@ -291,7 +287,6 @@ void ServoBusInterface::write(const ros::Time &t, const ros::Duration &dt) {
     writeTorqueForServos(goal_torque_individual_);
     lost_servo_connection_ = false;
   }
-
   if (control_mode_ == POSITION_CONTROL) {
     if (goal_effort_ != last_goal_effort_) {
       syncWritePWM();

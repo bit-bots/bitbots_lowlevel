@@ -61,7 +61,6 @@ int main(int argc, char *argv[]) {
       cm->update(current_time, period);
     }
     hw.write(current_time, period);
-
     ros::spinOnce();
     rate.sleep();
 
