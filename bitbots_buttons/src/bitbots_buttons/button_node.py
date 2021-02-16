@@ -17,15 +17,15 @@ class ButtonNode(object):
     """
 
     def __init__(self):
-        log_level = rospy.DEBUG if rospy.get_param("/debug_active", False) else rospy.INFO
+        log_level = rospy.DEBUG if rospy.get_param("debug_active", False) else rospy.INFO
         rospy.init_node("ButtonManager", log_level=log_level, anonymous=False)
 
         # --- Params ---
-        self.speaking_active = rospy.get_param("/buttons/speak_active", False)
-        self.short_time = rospy.get_param("/buttons/short_time", 2)
-        self.manual_penality_mode = rospy.get_param("/buttons/manual_penalty", True)
-        self.in_game_mode = rospy.get_param("/buttons/in_game", True)
-        self.debounce_time = rospy.get_param("/buttons/debounce_time", 0)
+        self.speaking_active = rospy.get_param("~speak_active", False)
+        self.short_time = rospy.get_param("~short_time", 2)
+        self.manual_penality_mode = rospy.get_param("~manual_penalty", True)
+        self.in_game_mode = rospy.get_param("~in_game", True)
+        self.debounce_time = rospy.get_param("~debounce_time", 0)
 
         # --- Class variables ---
         self.button1 = False
@@ -34,9 +34,9 @@ class ButtonNode(object):
         self.button2_time = 0
 
         # --- Initialize Topics ---
-        rospy.Subscriber("/buttons", Buttons, self.button_cb)
-        self.speak_publisher = rospy.Publisher('/speak', Audio, queue_size=10)
-        self.shoot_publisher = rospy.Publisher('/shoot_button', Bool, queue_size=1)
+        rospy.Subscriber("buttons", Buttons, self.button_cb)
+        self.speak_publisher = rospy.Publisher('speak', Audio, queue_size=10)
+        self.shoot_publisher = rospy.Publisher('shoot_button', Bool, queue_size=1)
 
         if self.manual_penality_mode:
             rospy.loginfo("Waiting for manual penalize service.")
