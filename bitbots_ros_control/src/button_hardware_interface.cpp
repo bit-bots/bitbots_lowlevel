@@ -13,7 +13,7 @@ bool ButtonHardwareInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) 
   nh_ = nh;
   data_ = (uint8_t *) malloc(3 * sizeof(uint8_t));
   button_pub_ = nh.advertise<bitbots_buttons::Buttons>(topic_, 1);
-  diagnostic_pub_ = nh.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 10, true);
+  diagnostic_pub_ = nh.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 10, true);
 
   return true;
 }

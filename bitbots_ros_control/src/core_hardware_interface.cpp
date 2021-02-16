@@ -30,18 +30,18 @@ bool CoreHardwareInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
   nh_ = nh;
   VBAT_individual_.data.resize(6);
   data_ = (uint8_t *) malloc(16 * sizeof(uint8_t));
-  power_pub_ = nh.advertise<std_msgs::Bool>("/core/power_switch_status", 1);
-  vcc_pub_ = nh.advertise<std_msgs::Float64>("/core/vcc", 1);
-  vbat_pub_ = nh.advertise<std_msgs::Float64>("/core/vbat", 1);
-  vbat_individual_pub_ = nh.advertise<std_msgs::Float64MultiArray>("/core/vbat_cells", 1);
-  vext_pub_ = nh.advertise<std_msgs::Float64>("/core/vext", 1);
-  vdxl_pub_ = nh.advertise<std_msgs::Float64>("/core/vdxl", 1);
-  current_pub_ = nh.advertise<std_msgs::Float64>("/core/current", 1);
+  power_pub_ = nh.advertise<std_msgs::Bool>("core/power_switch_status", 1);
+  vcc_pub_ = nh.advertise<std_msgs::Float64>("core/vcc", 1);
+  vbat_pub_ = nh.advertise<std_msgs::Float64>("core/vbat", 1);
+  vbat_individual_pub_ = nh.advertise<std_msgs::Float64MultiArray>("core/vbat_cells", 1);
+  vext_pub_ = nh.advertise<std_msgs::Float64>("core/vext", 1);
+  vdxl_pub_ = nh.advertise<std_msgs::Float64>("core/vdxl", 1);
+  current_pub_ = nh.advertise<std_msgs::Float64>("core/current", 1);
 
-  diagnostic_pub_ = nh.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 10, true);
+  diagnostic_pub_ = nh.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 10, true);
 
   // service to switch power
-  power_switch_service_ = nh_.advertiseService("/core/switch_power", &CoreHardwareInterface::switch_power, this);
+  power_switch_service_ = nh_.advertiseService("core/switch_power", &CoreHardwareInterface::switch_power, this);
   return true;
 }
 

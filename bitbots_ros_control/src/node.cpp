@@ -31,6 +31,7 @@ int main(int argc, char *argv[]) {
   // load controller directly here so that we have control when we shut down
   // sometimes we want to only load some of the controllers
   bool only_imu, only_pressure;
+  // TODO reevaluate this when we can start ros control again
   nh.param<bool>("/ros_control/only_imu", only_imu, false);
   nh.param<bool>("/ros_control/only_pressure", only_pressure, false);
   std::vector<std::string> names;
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
 
   // diagnostics
   int diag_counter = 0;
-  ros::Publisher diagnostic_pub = nh.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 10, true);
+  ros::Publisher diagnostic_pub = nh.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 10, true);
   diagnostic_msgs::DiagnosticArray array_msg = diagnostic_msgs::DiagnosticArray();
   std::vector<diagnostic_msgs::DiagnosticStatus> array = std::vector<diagnostic_msgs::DiagnosticStatus>();
   diagnostic_msgs::DiagnosticStatus status = diagnostic_msgs::DiagnosticStatus();
