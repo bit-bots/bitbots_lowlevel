@@ -93,7 +93,7 @@ ros_control:
       id: 241
       model_number: 0xBAFF
       interface_type: Button
-      topic: /buttons
+      topic: buttons
       read_rate: 50
     LEDs:
       id: 241
@@ -103,11 +103,11 @@ ros_control:
       start_number: 3
     LeftFoot:
       id: 102
-      topic: /foot_pressure_left/raw
+      topic: foot_pressure_left/raw
       model_number: 0
     RightFoot:
       id: 101
-      topic: /foot_pressure_right/raw
+      topic: foot_pressure_right/raw
       model_number: 0
     RShoulderPitch:
       id: 1
