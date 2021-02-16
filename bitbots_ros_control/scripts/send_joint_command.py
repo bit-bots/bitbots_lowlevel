@@ -7,7 +7,7 @@ import rospy
 from bitbots_msgs.msg import JointCommand
 
 
-DYNAMIXEL_CMD_TOPIC = "/DynamixelController/command"
+DYNAMIXEL_CMD_TOPIC = "DynamixelController/command"
 
 
 class PredefinedCommands:

@@ -27,7 +27,7 @@ class IMUMarker:
 
     def __init__(self, server):
         self.marker_name = "IMU"
-        self.imu_publisher = rospy.Publisher("/imu/data", Imu, queue_size=1)
+        self.imu_publisher = rospy.Publisher("imu/data", Imu, queue_size=1)
         self.server = server
         self.pose = Pose()
         self.pose.orientation.w = 1

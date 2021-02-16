@@ -5,7 +5,7 @@ from bitbots_msgs.srv import LedsRequest, Leds
 from std_msgs.msg import ColorRGBA
 
 rospy.init_node("leds_tester")
-prox = rospy.ServiceProxy("/set_leds", Leds)
+prox = rospy.ServiceProxy("set_leds", Leds)
 
 request = LedsRequest()
 for i in range(3):

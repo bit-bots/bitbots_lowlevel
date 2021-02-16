@@ -6,7 +6,7 @@ import math
 from bitbots_msgs.msg import JointCommand
 
 
-DYNAMIXEL_CMD_TOPIC = "/DynamixelController/command"
+DYNAMIXEL_CMD_TOPIC = "DynamixelController/command"
 JOINT_NAME = "LAnkleRoll"
 PUBLISH_RATE = 1000
 
