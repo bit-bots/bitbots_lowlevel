@@ -18,7 +18,7 @@ leds_red = False
 led_set_time = None
 
 # set up service and prepare requests
-led_serv = rospy.ServiceProxy("/set_leds", Leds)
+led_serv = rospy.ServiceProxy("set_leds", Leds)
 red_request = LedsRequest()
 red_leds_array = []
 for i in range(3):
@@ -67,10 +67,10 @@ def reset_leds():
 
 
 # wait a moment on startup, otherwise we will think there is a problem while ros control is still booting
-rospy.wait_for_service('/set_leds')
+rospy.wait_for_service('set_leds')
 rospy.sleep(1)
 
-rospy.Subscriber("/diagnostics_toplevel_state", DiagnosticStatus, cb, queue_size=1, tcp_nodelay=True)
+rospy.Subscriber("diagnostics_toplevel_state", DiagnosticStatus, cb, queue_size=1, tcp_nodelay=True)
 
 rate = rospy.Rate(100)
 while not rospy.is_shutdown():

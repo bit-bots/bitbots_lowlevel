@@ -53,7 +53,7 @@ PressureConverter::PressureConverter(ros::NodeHandle &pnh, char side) {
   resetZeroAndScaleValues();
 
   filtered_pub_ = pnh_.advertise<bitbots_msgs::FootPressure>(topic + "/filtered", 1);
-  cop_pub_ = pnh_.advertise<geometry_msgs::PointStamped>("/" + cop_lr_, 1);
+  cop_pub_ = pnh_.advertise<geometry_msgs::PointStamped>(cop_lr_, 1);
   std::string wrench_topics[] = {"l_front", "l_back", "r_front", "r_back", "cop"};
   for (int i = 0; i < 5; i++) {
     std::stringstream single_wrench_topic;

@@ -13,10 +13,10 @@ rospy.init_node("pressure_calibration")
 rospy.loginfo("Waiting for " + "/foot_pressure_left/set_foot_zero" + "/foot_pressure_left/set_foot_scale" 
               + "/foot_pressure_right/set_foot_zero" +"/foot_pressure_right/set_foot_scale")
 
-rospy.wait_for_service("/foot_pressure_left/set_foot_zero")
-rospy.wait_for_service("/foot_pressure_left/set_foot_scale")
-rospy.wait_for_service("/foot_pressure_right/set_foot_zero")
-rospy.wait_for_service("/foot_pressure_right/set_foot_scale")
+rospy.wait_for_service("foot_pressure_left/set_foot_zero")
+rospy.wait_for_service("foot_pressure_left/set_foot_scale")
+rospy.wait_for_service("foot_pressure_right/set_foot_zero")
+rospy.wait_for_service("foot_pressure_right/set_foot_scale")
 rospy.loginfo("found all services")
 
 rospy.loginfo("Welcome to the foot calibration suite. ")
@@ -27,7 +27,7 @@ rospy.loginfo("Press enter when there is no load on the weight cells of the LEFT
 input()
 
 
-zero = rospy.ServiceProxy("/foot_pressure_left/set_foot_zero", Empty)
+zero = rospy.ServiceProxy("foot_pressure_left/set_foot_zero", Empty)
 if zero():
     rospy.loginfo("Successfully set the zero position for all sensors")
 else:
@@ -38,7 +38,7 @@ else:
 
 sensors = ['left front','left back','right front','right back',]
 
-scale = rospy.ServiceProxy("/foot_pressure_left/set_foot_scale", FootScale)
+scale = rospy.ServiceProxy("foot_pressure_left/set_foot_scale", FootScale)
 request = FootScaleRequest()
 request.weight = CALIBRATION_WEIGHT
 
@@ -54,14 +54,14 @@ for i in range(len(sensors)):
 
 rospy.loginfo("Press enter when there is no load on the weight cells of the RIGHT foot")
 input()
-zero = rospy.ServiceProxy("/foot_pressure_right/set_foot_zero", Empty)
+zero = rospy.ServiceProxy("foot_pressure_right/set_foot_zero", Empty)
 if zero():
     rospy.loginfo("Successfully set the zero position for all sensors")
 else:
     rospy.loginfo("There was an error :(")
     exit(1)
 
-scale = rospy.ServiceProxy("/foot_pressure_right/set_foot_scale", FootScale)
+scale = rospy.ServiceProxy("foot_pressure_right/set_foot_scale", FootScale)
 
 rospy.loginfo("Starting calibration for RIGHT foot")
 for i in range(len(sensors)):

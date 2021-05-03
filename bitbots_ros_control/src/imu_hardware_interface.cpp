@@ -54,23 +54,23 @@ bool ImuHardwareInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
   parent_->registerInterface(&imu_interface_);
 
   // make services
-  imu_ranges_service_ = nh_.advertiseService("/imu/set_imu_ranges", &ImuHardwareInterface::setIMURanges, this);
-  calibrate_gyro_service_ = nh_.advertiseService("/imu/calibrate_gyro", &ImuHardwareInterface::calibrateGyro, this);
+  imu_ranges_service_ = nh_.advertiseService("imu/set_imu_ranges", &ImuHardwareInterface::setIMURanges, this);
+  calibrate_gyro_service_ = nh_.advertiseService("imu/calibrate_gyro", &ImuHardwareInterface::calibrateGyro, this);
   reset_gyro_calibration_service_ =
-      nh_.advertiseService("/imu/reset_gyro_calibration", &ImuHardwareInterface::resetGyroCalibration, this);
-  complementary_filter_params_service_ = nh_.advertiseService("/imu/set_complementary_filter_params",
+      nh_.advertiseService("imu/reset_gyro_calibration", &ImuHardwareInterface::resetGyroCalibration, this);
+  complementary_filter_params_service_ = nh_.advertiseService("imu/set_complementary_filter_params",
                                                               &ImuHardwareInterface::setComplementaryFilterParams,
                                                               this);
-  calibrate_accel_service_ = nh_.advertiseService("/imu/calibrate_accel", &ImuHardwareInterface::calibrateAccel, this);
+  calibrate_accel_service_ = nh_.advertiseService("imu/calibrate_accel", &ImuHardwareInterface::calibrateAccel, this);
   read_accel_calibration_service_ =
-      nh_.advertiseService("/imu/read_accel_calibration", &ImuHardwareInterface::readAccelCalibration, this);
+      nh_.advertiseService("imu/read_accel_calibration", &ImuHardwareInterface::readAccelCalibration, this);
   reset_accel_calibration_service_ =
-      nh_.advertiseService("/imu/reset_accel_calibration", &ImuHardwareInterface::resetAccelCalibraton, this);
-  set_accel_calib_threshold_service_ = nh_.advertiseService("/imu/set_accel_calibration_threshold",
+      nh_.advertiseService("imu/reset_accel_calibration", &ImuHardwareInterface::resetAccelCalibraton, this);
+  set_accel_calib_threshold_service_ = nh_.advertiseService("imu/set_accel_calibration_threshold",
                                                             &ImuHardwareInterface::setAccelCalibrationThreshold,
                                                             this);
 
-  diagnostic_pub_ = nh.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 10, true);
+  diagnostic_pub_ = nh.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 10, true);
 
   // read the current values in the IMU module so that they can later be displayed in diagnostic message
   bitbots_msgs::AccelerometerCalibrationRequest req = bitbots_msgs::AccelerometerCalibrationRequest();

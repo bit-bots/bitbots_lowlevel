@@ -5,7 +5,7 @@ from std_msgs.msg import ColorRGBA, Float64
 
 rospy.init_node("battery_led")
 
-pub = rospy.Publisher("/led2", ColorRGBA, queue_size=1)
+pub = rospy.Publisher("led2", ColorRGBA, queue_size=1)
 
 led_full = ColorRGBA()
 led_full.a = 1.0
@@ -43,5 +43,5 @@ def vbat_cb(msg: Float64):
         pub.publish(led_no)
 
 
-sub = rospy.Subscriber("/core/vbat", Float64, vbat_cb, queue_size=1, tcp_nodelay=True)
+sub = rospy.Subscriber("core/vbat", Float64, vbat_cb, queue_size=1, tcp_nodelay=True)
 rospy.spin()

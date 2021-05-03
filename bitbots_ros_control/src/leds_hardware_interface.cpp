@@ -22,19 +22,19 @@ LedsHardwareInterface::LedsHardwareInterface(std::shared_ptr<DynamixelDriver> &d
 bool LedsHardwareInterface::init(ros::NodeHandle &nh, ros::NodeHandle &hw_nh) {
   nh_ = nh;
   if (start_number_ == 0) {
-    leds_service_ = nh_.advertiseService("/set_leds", &LedsHardwareInterface::setLeds, this);
+    leds_service_ = nh_.advertiseService("set_leds", &LedsHardwareInterface::setLeds, this);
   }
-  sub0_ = nh_.subscribe("/led" + std::to_string(start_number_),
+  sub0_ = nh_.subscribe("led" + std::to_string(start_number_),
                         1,
                         &LedsHardwareInterface::ledCb0,
                         this,
                         ros::TransportHints().tcpNoDelay());
-  sub1_ = nh_.subscribe("/led" + std::to_string(start_number_ + 1),
+  sub1_ = nh_.subscribe("led" + std::to_string(start_number_ + 1),
                         1,
                         &LedsHardwareInterface::ledCb1,
                         this,
                         ros::TransportHints().tcpNoDelay());
-  sub2_ = nh_.subscribe("/led" + std::to_string(start_number_ + 2),
+  sub2_ = nh_.subscribe("led" + std::to_string(start_number_ + 2),
                         1,
                         &LedsHardwareInterface::ledCb2,
                         this,

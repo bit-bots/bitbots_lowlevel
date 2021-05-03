@@ -30,7 +30,7 @@ bool DynamixelServoHardwareInterface::init(ros::NodeHandle &nh, ros::NodeHandle 
                                                                   &DynamixelServoHardwareInterface::individualTorqueCb,
                                                                   this,
                                                                   ros::TransportHints().tcpNoDelay());
-  pwm_pub_ = nh.advertise<sensor_msgs::JointState>("/servo_PWM", 10, true);
+  pwm_pub_ = nh.advertise<sensor_msgs::JointState>("servo_PWM", 10, true);
 
   torqueless_mode_ = nh.param("torqueless_mode", false);
   // init merged vectors for controller
