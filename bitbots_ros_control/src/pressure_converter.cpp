@@ -81,7 +81,7 @@ PressureConverter::PressureConverter(rclcpp::Node::SharedPtr nh, char side){
   zero_service_ = nh_->create_service<std_srvs::srv::Empty>(topic + "/set_foot_zero", std::bind(&PressureConverter::zeroCallback, this, _1, _2));
   sub_ = nh_->create_subscription<bitbots_msgs::msg::FootPressure>(topic + "/raw",
                         1, std::bind(&PressureConverter::pressureCallback, this, _1));
-
+  tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*nh_);
 }
 
 void PressureConverter::pressureCallback(bitbots_msgs::msg::FootPressure pressure_raw) {
